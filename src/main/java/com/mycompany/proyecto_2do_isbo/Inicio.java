@@ -238,7 +238,8 @@ public class Inicio extends javax.swing.JFrame {
         }
         catch(SQLException ex)
         {
-            
+            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+            this.dispose();
         }                                          
 
     }//GEN-LAST:event_btnAceptarActionPerformed
