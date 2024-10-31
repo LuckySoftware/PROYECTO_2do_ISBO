@@ -1,6 +1,6 @@
 -- Creacion de la base de datos
 CREATE DATABASE proyecto_db;
-
+-- DROP DATABASE proyecto_db;
 -- Uso de la base de datos
 USE proyecto_db;
 
@@ -17,14 +17,9 @@ CREATE TABLE jugador (
     userPassword VARCHAR(30)
 );
 
-DESCRIBE jugador;
-DROP TABLE jugador;
+-- DESCRIBE jugador;
+-- DROP TABLE jugador;
 SELECT * FROM jugador;
-INSERT INTO jugador (paisResidencia, paisNacimiento) VALUES ("Uruguay", "Uruguay");
-
-
-
-
 
 -- TABLA DE PARTIDA
 CREATE TABLE partida (
@@ -44,7 +39,7 @@ CREATE TABLE juega (
     rol ENUM('Activo', 'Esperando'),
     PRIMARY KEY(idPartida, idJugador),
     FOREIGN KEY(idPartida) REFERENCES partida(idPartida),
-    FOREIGN KEY(idJugador) REFERENCES jugadores(idJugador)
+    FOREIGN KEY(idJugador) REFERENCES jugador(idJugador)
 );
 
 
@@ -59,14 +54,20 @@ CREATE TABLE ronda (
     FOREIGN KEY(idPartida) REFERENCES partida(idPartida)
 );
 
-
-
+-- TABLA DE CATEGORIAS
+CREATE TABLE categoria (
+    idCategoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(20),
+    descripcion VARCHAR(100)
+);
+-- drop table categoria;
 -- TABLA DE PREGUNTAS
 CREATE TABLE pregunta (
-    idPregunta INT,
+    idPregunta int AUTO_INCREMENT ,
     idCategoria INT,
     respuestaCorrecta VARCHAR(30),
     nivelDificultad VARCHAR(25),
+    textoPregunta VARCHAR(255),
     PRIMARY KEY(idPregunta),
     FOREIGN KEY(idCategoria) REFERENCES categoria(idCategoria)
 );
@@ -78,16 +79,8 @@ CREATE TABLE opcionRespuesta (
     idOpcion INT AUTO_INCREMENT PRIMARY KEY,
     idPregunta INT,
     textoOpcion VARCHAR(30),
+    esCorrecta BOOLEAN DEFAULT FALSE,
     FOREIGN KEY(idPregunta) REFERENCES pregunta(idPregunta)
-);
-
-
-
--- TABLA DE CATEGORIAS
-CREATE TABLE categoria (
-    idCategoria INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(20),
-    descripcion VARCHAR(40)
 );
 
 
@@ -99,6 +92,63 @@ CREATE TABLE ranking (
     idCategoria INT,
     posicion INT,
     puntosObtenidos INT,
-	FOREIGN KEY(idJugador) REFERENCES jugadores(idJugador),
+	FOREIGN KEY(idJugador) REFERENCES jugador(idJugador),
     FOREIGN KEY(idCategoria) REFERENCES categoria(idCategoria)
 );
+
+SELECT * FROM ranking;
+
+-- INSERT INTO ranking (idJugador, idCategoria, posicion, puntosObtenidos) VALUES (1, 1, 1, 10);
+UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = 1;
+
+
+-- Insertar categorías
+INSERT INTO categoria (nombre, descripcion) VALUES 
+('Geografía', 'Preguntas relacionadas con lugares y mapas'),
+('Matemáticas', 'Preguntas de operaciones matemáticas básicas'),
+('Ciencia', 'Preguntas de ciencias naturales'),
+('Tecnología', 'Preguntas sobre programación y tecnología');
+
+-- Insertar preguntas con respuestas correctas en la columna 'respuestaCorrecta'
+INSERT INTO pregunta (idCategoria, textoPregunta, respuestaCorrecta, nivelDificultad) VALUES 
+(1,  '¿Cuál es el continente más grande?' ,'Asia', 'Medio'),    
+(2, '¿Cuánto es 10 + 10?' ,'20', 'Fácil'),      
+(3, '¿Cuál es la unidad básica de la vida?','Célula', 'Fácil'),  
+(4, '¿Qué lenguaje de programación se utiliza principalmente para aplicaciones Android?' ,'Java', 'Medio');
+
+-- Insertar opciones de respuesta para cada pregunta (asumiendo que los IDs son conocidos)
+-- Pregunta: ¿Cuál es el continente más grande?
+INSERT INTO opcionRespuesta (idPregunta, textoOpcion) VALUES 
+(1, 'África'),
+(1, 'Europa'),
+(1, 'América'),
+(1, 'Asia');  -- Correcta
+
+-- Pregunta: ¿Cuánto es 10 + 10?
+INSERT INTO opcionRespuesta (idPregunta, textoOpcion) VALUES 
+(2, '15'),
+(2, '30'),
+(2, '25'),
+(2, '20');  -- Correcta
+
+-- Pregunta: ¿Cuál es la unidad básica de la vida?
+INSERT INTO opcionRespuesta (idPregunta, textoOpcion) VALUES 
+(3, 'Órgano'),
+(3, 'Tejido'),
+(3, 'Átomo'),
+(3, 'Célula');  -- Correcta
+
+-- Pregunta: ¿Qué lenguaje de programación se utiliza principalmente para aplicaciones Android?
+INSERT INTO opcionRespuesta (idPregunta, textoOpcion) VALUES 
+(4, 'Python'),
+(4, 'JavaScript'),
+(4, 'Kotlin'),
+(4, 'Java');  -- Correcta
+
+SELECT * FROM pregunta;
+SELECT * FROM opcionRespuesta;
+
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 4;  
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 8;  
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 12; 
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 16;

@@ -1,86 +1,172 @@
 package com.mycompany.proyecto_2do_isbo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- *
- * @author ilucky
- */
 public class Juego extends javax.swing.JFrame {
+    
+    private Timer temporizador;
+    
+    private int tiempoRestante = 10;
+    
+    private String preguntaCorrecta;
+    
+    private String textoPregunta;
+    
+    private String[] opcionesRespuesta = new String[4];
+    
+    private int indiceRespuestaCorrecta;
+    
+    private int idJugadorActivo = 1; // ID DEL JUGADOR ACTIVO (POR DEFECTO, JUGADOR 1)
+  
+    BaseDeDatos baseDeDatos = new BaseDeDatos();
 
-
-    private Timer timer;
     
-    private int tiempo = 10;
     
-    private String pregunta = "¿Cual es la capital de Francia?";
-    
-    private String[] respuesta = {"Berlin", "Madrid", "Paris", "Lisboa"};
-    
-    private int IndiceRespuestaCorrecta = 2;
-
     public Juego() 
     {
         initComponents();
-        preguntasRespuestas();
-        timer();
+        cargarPreguntasYRespuestas();       
+        cargarPreguntaAleatoria();
+        iniciarTemporizador();
+    }
+    
+    private void cargarPreguntaAleatoria() 
+    {
+        Connection conexion = baseDeDatos.getConnection();
+    
+        if (conexion != null) 
+        {
+            try 
+            {
+                // SELECCIONAMOS UNA PREGUNTA ALEATORIA
+                String consultaPregunta = "SELECT * FROM pregunta ORDER BY RAND() LIMIT 1";
+                Statement sentencia = conexion.createStatement();
+                ResultSet resultadoPregunta = sentencia.executeQuery(consultaPregunta);
+                
+                if (resultadoPregunta.next())
+                {
+                    textoPregunta = resultadoPregunta.getString("textoPregunta");
+                    preguntaCorrecta = resultadoPregunta.getString("respuestaCorrecta"); 
+                    int idPregunta = resultadoPregunta.getInt("idPregunta");
+                    
+                    // OBTENEMOS LAS OPCIONES DE RESPUESTA
+                    String consultaOpciones = "SELECT textoOpcion FROM opcionRespuesta WHERE idPregunta = ?";
+                    PreparedStatement premisa = conexion.prepareStatement(consultaOpciones);
+                    premisa.setInt(1, idPregunta);
+                    ResultSet resultadoOpciones = premisa.executeQuery();
+                    
+                    int i = 0;
+                    indiceRespuestaCorrecta = 0;
+                    
+                    while (resultadoOpciones.next() && i < 4) 
+                    {
+                        String opcion = resultadoOpciones.getString("textoOpcion");
+                        opcionesRespuesta[i] = opcion;  
+                       
+                        if (opcion.equals(preguntaCorrecta)) 
+                        {
+                            indiceRespuestaCorrecta = i; // GUARDAMOS EL INDICE DE LA RESPUESTA CORRECTA
+                        }
+                        
+                        i++;
+                    }
+
+                    // RELLENAMOS OPCIONES VACIAS
+                    while (i < 4) 
+                    {
+                        opcionesRespuesta[i] = "";
+                        i++;
+                    }
+                }
+
+                cargarPreguntasYRespuestas();
+              
+            } catch (SQLException e) 
+            { 
+                JOptionPane.showMessageDialog(null, "ERROR AL CARGAR LA PREGUNTA: " + e.getMessage());
+            }
+        }
     }
 
-    private void preguntasRespuestas() 
+    private void cargarPreguntasYRespuestas() 
     {
-        labelParrafo.setText(pregunta);
-        btn1.setText(respuesta[0]);
-        btn2.setText(respuesta[1]);
-        btn3.setText(respuesta[2]);
-        btn4.setText(respuesta[3]);
+        labelParrafo.setText(textoPregunta);
+        btn1.setText(opcionesRespuesta[0]);
+        btn2.setText(opcionesRespuesta[1]); 
+        btn3.setText(opcionesRespuesta[2]);
+        btn4.setText(opcionesRespuesta[3]);
     }
 
-    private void timer() 
+    private void iniciarTemporizador()
     {
-        
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() 
+        temporizador = new Timer();
+        temporizador.scheduleAtFixedRate(new TimerTask() 
         {
             @Override
             public void run() 
             {
-                tiempo--;
                 
-                labelTemporizador.setText("Tiempo: " + tiempo + "s");
+                tiempoRestante--; // DISMINUIMOS EL TIEMPO RESTANTE
+                labelTemporizador.setText("Tiempo: " + tiempoRestante + " s");
                 
-                if (tiempo <= 0) 
-                {
-                    timer.cancel();
-                    fin(false);
+                if (tiempoRestante <= 0) {
+                    temporizador.cancel(); // DETENEMOS EL TEMPORIZADOR
                 }
             }
         }, 1000, 1000);
     }
 
-    private void respuesta(int selectedIndex) 
+    
+    
+    
+    
+    
+    private void respuesta(int indiceSeleccionado) 
     {
+        boolean esCorrecta = indiceSeleccionado == indiceRespuestaCorrecta; // VERIFICAMOS SI LA RESPUE
+        temporizador.cancel(); // DETENEMOS EL TEMPORIZADOR
         
-        timer.cancel();
-        boolean correcto = selectedIndex == IndiceRespuestaCorrecta;
-        fin(correcto);
         
-    }
+        try 
+        {
+            BaseDeDatos bd = new BaseDeDatos();
+            PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = ?");
 
-    private void fin(boolean correcto) {
-        String aviso = correcto ? "¡Respuesta Correcta!" : "Respuesta Incorrecta. La respuesta correcta era: " + respuesta[IndiceRespuestaCorrecta];
-        JOptionPane.showMessageDialog(this, aviso);
-        this.dispose();
-    }
+            int idJugador = 1; // ID del jugador al que se le van a agregar puntos
 
-    
-    
-    
-    
+            sentencia.setInt(1, idJugador);
+
+            int filasActualizadas = sentencia.executeUpdate();
+
+            // Verifica si se actualizO alguna fila
+            if (filasActualizadas > 0) {
+                JOptionPane.showMessageDialog(null, "Se han asignado 10 puntos al usuario con ID " + idJugador);
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró el usuario con ID " + idJugador);
+            }
+
+        }
+        
+        catch (SQLException e) 
+        {
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        }
+        
+        tiempoRestante = 11;
+        iniciarTemporizador();      
+        cargarPreguntaAleatoria();
+        cargarPreguntasYRespuestas(); 
+    }
     
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
@@ -176,27 +262,27 @@ public class Juego extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn1ActionPerformed
+    private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {                                     
         // TODO add your handling code here:
          respuesta(0);
-    }//GEN-LAST:event_btn1ActionPerformed
+    }                                    
 
-    private void btn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn2ActionPerformed
+    private void btn2ActionPerformed(java.awt.event.ActionEvent evt) {                                     
         // TODO add your handling code here:
          respuesta(1);  
-    }//GEN-LAST:event_btn2ActionPerformed
+    }                                    
 
-    private void btn3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn3ActionPerformed
+    private void btn3ActionPerformed(java.awt.event.ActionEvent evt) {                                     
         // TODO add your handling code here:
         respuesta(2);  
-    }//GEN-LAST:event_btn3ActionPerformed
+    }                                    
 
-    private void btn4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn4ActionPerformed
+    private void btn4ActionPerformed(java.awt.event.ActionEvent evt) {                                     
         // TODO add your handling code here:
         respuesta(3);  
-    }//GEN-LAST:event_btn4ActionPerformed
+    }                                    
 
     /**
      * @param args the command line arguments
@@ -233,7 +319,7 @@ public class Juego extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton btn1;
     private javax.swing.JButton btn2;
     private javax.swing.JButton btn3;
@@ -241,5 +327,6 @@ public class Juego extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel labelParrafo;
     private javax.swing.JLabel labelTemporizador;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
+
 }
