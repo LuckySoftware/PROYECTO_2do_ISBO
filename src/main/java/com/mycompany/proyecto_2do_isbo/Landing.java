@@ -14,14 +14,17 @@ public class Landing extends javax.swing.JFrame {
     /**
      * Creates new form landing
      */
-    public Landing(String nombreCompleto) {
+    public Landing(String nombreCompleto) 
+    {
         initComponents();
-        
-            Landing ventanaLanding = new Landing(nombreCompleto);
-            jLabel2.setText("Hola, "+nombreCompleto);
-    
-    
+        jLabel2.setText("Hola, "+nombreCompleto);
     }
+
+    public void ventanaLanding()
+    {
+        initComponents();
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

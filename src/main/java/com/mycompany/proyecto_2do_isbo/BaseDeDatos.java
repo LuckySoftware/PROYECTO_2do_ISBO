@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.swing.JOptionPane;
 
 /*
@@ -51,8 +52,9 @@ public class BaseDeDatos
         
         
         // METODO PARA EJECUTAR CONSULTAS SELECT
-        public void ejecutarSQL(PreparedStatement sql)
+        public ResultSet ejecutarSQL(PreparedStatement sql)
         {
+           
             
             try
             {
@@ -69,14 +71,17 @@ public class BaseDeDatos
                 this.result = null;  
                 
             }
+            return this.result;
         }
         
          //Método para ejecutar consultas de tipo Ingreso, modificación o borrado
          public void ejecutar(PreparedStatement sql)
          {
-            try{
+            try
+            {
                 sql.execute();
-            }catch(SQLException ex)
+            }
+            catch(SQLException ex)
             {
                 JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
             }
