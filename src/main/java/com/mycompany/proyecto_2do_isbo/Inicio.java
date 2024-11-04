@@ -198,9 +198,7 @@ public class Inicio extends javax.swing.JFrame {
         // TODO add your handling code here:
         
         String correoElectronico = txtEmail.getText();
-        String userPassword = String.valueOf(txtPassword.getPassword());
-        
-        
+        String userPassword = String.valueOf(txtPassword.getPassword());        
         //Crear la conexion
         BaseDeDatos bd = new BaseDeDatos();
         
@@ -210,7 +208,8 @@ public class Inicio extends javax.swing.JFrame {
             PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT count(*) FROM jugador WHERE correoElectronico = ? AND userPassword = ?");
             sentencia.setString(1, correoElectronico);
             sentencia.setString(2, userPassword);
-            
+
+
             ResultSet buscador = bd.ejecutarSQL(sentencia);
 
             
@@ -222,7 +221,7 @@ public class Inicio extends javax.swing.JFrame {
            // RESULTANTE DEL BUSCADOR
            if(cantidad == 1)
            {
-               Landing ventanaLanding = new Landing(userPassword);
+               Landing ventanaLanding = new Landing(correoElectronico);
                ventanaLanding.setVisible(true);
                this.setVisible(false);
            }
@@ -231,6 +230,7 @@ public class Inicio extends javax.swing.JFrame {
                JOptionPane.showMessageDialog(null, "Datos erroneos, o jugador no existente");
            }
           
+        
             
         }
         catch(SQLException ex)

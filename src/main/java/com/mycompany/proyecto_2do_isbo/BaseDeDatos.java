@@ -55,7 +55,6 @@ public class BaseDeDatos
         public ResultSet ejecutarSQL(PreparedStatement sql)
         {
            
-            
             try
             {
                 
@@ -87,6 +86,34 @@ public class BaseDeDatos
             }
         }
         
+
+        // SACAR EL ID DE JUGADOR
+
+        public ResultSet identificador(PreparedStatement sql)
+        {
+
+            try
+            {
+                String nombreJugador = "";
+                BaseDeDatos bd = new BaseDeDatos();
+                PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM jugador WHERE nombreCompleto = ?");
+                sentencia.setString(1, nombreJugador);
+                ResultSet resultado = sentencia.executeQuery();
+                return resultado;  
+            }
+            
+            
+            catch(SQLException ex)
+            {
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+            }
+
+            return this.result;
+
+        }
+
+
+
 
         // GETTERS & SETTERS
         public Connection getConnection() 

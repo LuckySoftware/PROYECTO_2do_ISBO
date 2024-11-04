@@ -1,14 +1,14 @@
 package com.mycompany.proyecto_2do_isbo;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Random;
+
 import javax.swing.*;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -66,7 +66,7 @@ public class Juego extends javax.swing.JFrame {
                     ResultSet resultadoOpciones = premisa.executeQuery();
                     
                     int i = 0;
-                    indiceRespuestaCorrecta = 0;
+                    indiceRespuestaCorrecta = i;
                     
                     while (resultadoOpciones.next() && i < 4) 
                     {
@@ -75,7 +75,7 @@ public class Juego extends javax.swing.JFrame {
                        
                         if (opcion.equals(preguntaCorrecta)) 
                         {
-                            indiceRespuestaCorrecta = i; // GUARDAMOS EL INDICE DE LA RESPUESTA CORRECTA
+                            indiceRespuestaCorrecta = i; // ALOJAR EL INDICE DE LA RESPUESTA CORRECTA (i)
                         }
                         
                         i++;
@@ -116,64 +116,22 @@ public class Juego extends javax.swing.JFrame {
             public void run() 
             {
                 
-                tiempoRestante--; // DISMINUIMOS EL TIEMPO RESTANTE
+                tiempoRestante--;
                 labelTemporizador.setText("Tiempo: " + tiempoRestante + " s");
                 
-                if (tiempoRestante <= 0) {
-                    temporizador.cancel(); // DETENEMOS EL TEMPORIZADOR
+                if (tiempoRestante <= 0) 
+                {
+                    temporizador.cancel();
                 }
             }
         }, 1000, 1000);
     }
-
-    
-    // inicio
-
-    // Conexión a la base de datos
-    Connection conexion = baseDeDatos.getConnection();
-    try
-    {
-
-        String sentencia = 
-        """
-        SELECT idJugador
-        FROM jugador
-        JOIN partida ON idJugador = idJugador
-        WHERE rol = 'Activo' AND rol = 'Esperando';
-        """;
-            
-        PreparedStatement sentencia = bd.getConnection().prepareStatement(sentencia);
-             
-        ResultSet resultSet = bd.ejecutarSQL(sentencia);
-    }
-
-    // Procesar los resultados
-    while (resultSet.next()) 
-    {
-
-        idJugador.add(resultSet.getInt("idJugador"));
-
-    }
-
-    } catch (SQLException e) {
-        e.printStackTrace(); // Manejo de excepciones
-    }
-
-        return idJugadores;
-    
-
-    //JugadorService jugadorService = new JugadorService();
-    //List<Integer> jugadoresEnPartida = jugadorService.obtenerJugadoresEnPartida();
-    
-
-    // fin
-    
-    
     
     private void respuesta(int indiceSeleccionado) 
     {
-        boolean esCorrecta = indiceSeleccionado == indiceRespuestaCorrecta; // VERIFICAMOS SI LA RESPUE
-        temporizador.cancel(); // DETENEMOS EL TEMPORIZADOR
+
+        boolean esCorrecta = indiceSeleccionado == indiceRespuestaCorrecta;
+        temporizador.cancel();
         
         
         try 
@@ -181,16 +139,21 @@ public class Juego extends javax.swing.JFrame {
             BaseDeDatos bd = new BaseDeDatos();
             PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = ?");
 
-            int idJugador = 1;
+            int idJugador = idJugadorActivo;
 
             sentencia.setInt(1, idJugador);
 
             int filasActualizadas = sentencia.executeUpdate();
 
             // Verifica si se actualizO alguna fila
-            if (filasActualizadas > 0) {
+            if (filasActualizadas > 0) 
+            {
                 JOptionPane.showMessageDialog(null, "Se han asignado 10 puntos al usuario con ID " + idJugador);
-            } else {
+
+            }
+
+            else 
+            {
                 JOptionPane.showMessageDialog(null, "No se encontró el usuario con ID " + idJugador);
             }
 
@@ -209,7 +172,8 @@ public class Juego extends javax.swing.JFrame {
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents() {
+    private void initComponents() 
+    {
 
         jLabel1 = new javax.swing.JLabel();
         btn1 = new javax.swing.JButton();
@@ -304,7 +268,7 @@ public class Juego extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>                        
+    }                     
 
     private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {                                     
         // TODO add your handling code here:

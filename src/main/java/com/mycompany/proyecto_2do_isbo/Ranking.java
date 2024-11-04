@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  * @author ilucky
  */
 public class Ranking extends javax.swing.JFrame {
-DefaultListModel rankingList = new DefaultListModel();
+    DefaultListModel rankingList = new DefaultListModel();
     
     
     /**
@@ -93,46 +93,49 @@ DefaultListModel rankingList = new DefaultListModel();
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         
-         //Abrir conexión con la Base de Datos
-         BaseDeDatos bd = new BaseDeDatos();
+        //Abrir conexión con la Base de Datos
+        BaseDeDatos bd = new BaseDeDatos();
         
-   try {
-        // Preparar la sentencia
-        PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM ranking WHERE idRanking != ? ORDER BY puntosObtenidos DESC");
-        sentencia.setInt(1, 0);
-
-        // Ejecutar la sentencia
-        ResultSet resultado = sentencia.executeQuery();
-
-        rankingList.clear(); 
-        
-        // Recorrer el resultado
-        while (resultado.next()) 
+        try 
         {
-            String idRanking = resultado.getString("idRanking");
-            String idJugador = resultado.getString("idJugador");
-            String puntosObtenidos = resultado.getString("puntosObtenidos");
-            rankingList.addElement("Ranking: " + idRanking + " | Jugador: " + idJugador + " | Puntos: " + puntosObtenidos );
-        }
+            // Preparar la sentencia
+            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM ranking");
+
+            // Ejecutar la sentencia
+            ResultSet resultado = sentencia.executeQuery(); 
         
-        } catch (SQLException e) 
+            // Recorrer el resultado
+            while (resultado.next()) 
+            {
+                String idRanking = resultado.getString("idRanking");
+                String idJugador = resultado.getString("idJugador");
+                String puntosObtenidos = resultado.getString("puntosObtenidos");
+                rankingList.addElement("Ranking: " +idRanking+ " | Jugador: " +idJugador+ " | Puntos: " +puntosObtenidos);
+            }
+        
+        }
+
+        catch (SQLException e) 
         {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }
+
+    private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        // TODO add your handling code here:
+        this.setVisible(false);
+        Landing ventanaLanding = new Landing("");
+        ventanaLanding.setVisible(true);
+    }     
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
