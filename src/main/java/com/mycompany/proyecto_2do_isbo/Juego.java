@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Random;
 
 import javax.swing.*;
 
@@ -26,7 +25,7 @@ public class Juego extends javax.swing.JFrame {
     
     private int indiceRespuestaCorrecta;
     
-    private int idJugadorActivo = 1; // ID DEL JUGADOR ACTIVO (POR DEFECTO, JUGADOR 1)
+    private int idJugadorActivo = 1; //default
   
     BaseDeDatos baseDeDatos = new BaseDeDatos();
 
@@ -91,7 +90,9 @@ public class Juego extends javax.swing.JFrame {
 
                 cargarPreguntasYRespuestas();
               
-            } catch (SQLException e) 
+            }
+
+            catch (SQLException e) 
             { 
                 JOptionPane.showMessageDialog(null, "ERROR AL CARGAR LA PREGUNTA: " + e.getMessage());
             }
@@ -169,9 +170,8 @@ public class Juego extends javax.swing.JFrame {
         cargarPreguntaAleatoria();
         cargarPreguntasYRespuestas(); 
     }
-    
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+
+                       
     private void initComponents() 
     {
 
@@ -189,29 +189,37 @@ public class Juego extends javax.swing.JFrame {
         jLabel1.setText("RESPONDI-2");
 
         btn1.setText("boton 1");
-        btn1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn1.addActionListener(new java.awt.event.ActionListener() 
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt) 
+            {
                 btn1ActionPerformed(evt);
             }
         });
 
         btn2.setText("boton 2");
-        btn2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn2.addActionListener(new java.awt.event.ActionListener() 
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt) 
+            {
                 btn2ActionPerformed(evt);
             }
         });
 
         btn3.setText("boton 3");
-        btn3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn3.addActionListener(new java.awt.event.ActionListener() 
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt) 
+            {
                 btn3ActionPerformed(evt);
             }
         });
 
         btn4.setText("boton 4");
-        btn4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn4.addActionListener(new java.awt.event.ActionListener() 
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt) 
+            {
                 btn4ActionPerformed(evt);
             }
         });
@@ -270,22 +278,26 @@ public class Juego extends javax.swing.JFrame {
         pack();
     }                     
 
-    private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {                                     
+    private void btn1ActionPerformed(java.awt.event.ActionEvent evt) 
+    {                                     
         // TODO add your handling code here:
          respuesta(0);
     }                                    
 
-    private void btn2ActionPerformed(java.awt.event.ActionEvent evt) {                                     
+    private void btn2ActionPerformed(java.awt.event.ActionEvent evt) 
+    {                                     
         // TODO add your handling code here:
          respuesta(1);  
     }                                    
 
-    private void btn3ActionPerformed(java.awt.event.ActionEvent evt) {                                     
+    private void btn3ActionPerformed(java.awt.event.ActionEvent evt) 
+    {                                     
         // TODO add your handling code here:
         respuesta(2);  
     }                                    
 
-    private void btn4ActionPerformed(java.awt.event.ActionEvent evt) {                                     
+    private void btn4ActionPerformed(java.awt.event.ActionEvent evt) 
+    {                                     
         // TODO add your handling code here:
         respuesta(3);  
     }                                    
@@ -293,29 +305,39 @@ public class Juego extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+    public static void main(String args[]) 
+    {
+        try 
+        {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) 
+            {
                 if ("Nimbus".equals(info.getName())) {
+
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+
+        catch (ClassNotFoundException ex) 
+        {
             java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+
+        catch (InstantiationException ex) 
+        {
+            java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } 
+
+        catch (IllegalAccessException ex) 
+        {
+            java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } 
+        
+        catch (javax.swing.UnsupportedLookAndFeelException ex) 
+        {
+            java.util.logging.Logger.getLogger(Juego.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
