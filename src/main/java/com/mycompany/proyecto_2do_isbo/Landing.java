@@ -17,7 +17,7 @@ public class Landing extends javax.swing.JFrame {
     public Landing(String nombreCompleto) 
     {
         initComponents();
-        jLabel2.setText("Hola, "+nombreCompleto);
+        jLabel2.setText("Hola "+nombreCompleto);
     }
 
     public void ventanaLanding()
@@ -132,7 +132,7 @@ public class Landing extends javax.swing.JFrame {
 
     private void btnConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigActionPerformed
         // TODO add your handling code here:
-        Configuracion ventanaConfiguracion = new Configuracion();
+        Configuracion ventanaConfiguracion = new Configuracion("");
         ventanaConfiguracion.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnConfigActionPerformed

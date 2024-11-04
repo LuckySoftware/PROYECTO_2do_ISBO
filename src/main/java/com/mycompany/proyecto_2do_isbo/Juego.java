@@ -1,11 +1,14 @@
 package com.mycompany.proyecto_2do_isbo;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.*;
+
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -124,7 +127,46 @@ public class Juego extends javax.swing.JFrame {
     }
 
     
+    // inicio
+
+    // Conexión a la base de datos
+    Connection conexion = baseDeDatos.getConnection();
+    try
+    {
+
+        String sentencia = 
+        """
+        SELECT idJugador
+        FROM jugador
+        JOIN partida ON idJugador = idJugador
+        WHERE rol = 'Activo' AND rol = 'Esperando';
+        """;
+            
+        PreparedStatement sentencia = bd.getConnection().prepareStatement(sentencia);
+             
+        ResultSet resultSet = bd.ejecutarSQL(sentencia);
+    }
+
+    // Procesar los resultados
+    while (resultSet.next()) 
+    {
+
+        idJugador.add(resultSet.getInt("idJugador"));
+
+    }
+
+    } catch (SQLException e) {
+        e.printStackTrace(); // Manejo de excepciones
+    }
+
+        return idJugadores;
     
+
+    //JugadorService jugadorService = new JugadorService();
+    //List<Integer> jugadoresEnPartida = jugadorService.obtenerJugadoresEnPartida();
+    
+
+    // fin
     
     
     
@@ -139,7 +181,7 @@ public class Juego extends javax.swing.JFrame {
             BaseDeDatos bd = new BaseDeDatos();
             PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = ?");
 
-            int idJugador = 1; // ID del jugador al que se le van a agregar puntos
+            int idJugador = 1;
 
             sentencia.setInt(1, idJugador);
 

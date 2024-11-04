@@ -4,9 +4,15 @@
  */
 package com.mycompany.proyecto_2do_isbo;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.swing.JOptionPane;
+
+import com.sun.source.tree.Tree;
 
 /**
  *
@@ -14,10 +20,8 @@ import javax.swing.JOptionPane;
  */
 public class Configuracion extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Configuracion
-     */
-    public Configuracion() {
+    public Configuracion(String nombreCompleto) 
+    {
         initComponents();
     }
 
@@ -141,6 +145,10 @@ public class Configuracion extends javax.swing.JFrame {
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
         // TODO add your handling code here:
+        String nombre = txtNombreCompleto.getText(); 
+
+        Landing ventanaLanding = new Landing(nombre);
+        ventanaLanding.setVisible(true);
         this.setVisible(false);
         
     }//GEN-LAST:event_btnAtrasActionPerformed
@@ -152,21 +160,25 @@ public class Configuracion extends javax.swing.JFrame {
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
         
-String nombre = txtNombreCompleto.getText(); 
-String email = txtEmail.getText();
-String contra = String.valueOf(txtPassword.getPassword());   
+    String nombre = txtNombreCompleto.getText(); 
+    String email = txtEmail.getText();
+    String contra = String.valueOf(txtPassword.getPassword());   
 
-if (nombre.isEmpty() || email.isEmpty() || contra.isEmpty()) 
-{
-    JOptionPane.showMessageDialog(null, "Por favor completa todos los campos.");
-    return;
-}
+    if (nombre.isEmpty() || email.isEmpty() || contra.isEmpty()) 
+    {
+        JOptionPane.showMessageDialog(null, "Por favor completa todos los campos.");
+        return;
+    }
 
-//Crear la conexion
-BaseDeDatos bd = new BaseDeDatos();
+    //Crear la conexion
+    BaseDeDatos bd = new BaseDeDatos();
 
-try {
-        PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE jugador SET nombreCompleto = ?, correoElectronico = ?, userPassword = ? WHERE idJugador = ?");
+    try 
+    {
+
+        
+
+        PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE jugador SET nombreCompleto = ?, correoElectronico = ?, userPassword = ? LIMIT 1");
         sentencia.setString(1, nombre);
         sentencia.setString(2, email);
         sentencia.setString(3, contra);
@@ -224,7 +236,7 @@ try {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Configuracion().setVisible(true);
+                //new Configuracion().setVisible(true);
             }
         });
     }
