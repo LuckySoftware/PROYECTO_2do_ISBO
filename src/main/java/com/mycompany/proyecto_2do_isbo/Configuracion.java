@@ -160,7 +160,8 @@ public class Configuracion extends javax.swing.JFrame {
         
     String nombre = txtNombreCompleto.getText(); 
     String email = txtEmail.getText();
-    String contra = String.valueOf(txtPassword.getPassword());   
+    String contra = String.valueOf(txtPassword.getPassword()); 
+    String id = String.valueOf(jugadorId);  
 
     if (nombre.isEmpty() || email.isEmpty() || contra.isEmpty()) 
     {
@@ -174,12 +175,11 @@ public class Configuracion extends javax.swing.JFrame {
     try 
     {
 
-        
-
-        PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE jugador SET nombreCompleto = ?, correoElectronico = ?, userPassword = ? LIMIT 1");
+        PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE jugador SET nombreCompleto = ?, correoElectronico = ?, userPassword = ? WHERE idJugador = ? LIMIT 1");
         sentencia.setString(1, nombre);
         sentencia.setString(2, email);
         sentencia.setString(3, contra);
+        sentencia.setString(4, id);
     
         // Ejecutar sentencia
         int filasAfectadas = sentencia.executeUpdate();
