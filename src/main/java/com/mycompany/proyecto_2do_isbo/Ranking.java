@@ -14,9 +14,12 @@ import javax.swing.JOptionPane;
  *
  * @author ilucky
  */
-public class Ranking extends javax.swing.JFrame {
+public class Ranking extends javax.swing.JFrame 
+{
+
     DefaultListModel rankingList = new DefaultListModel();
-    
+
+    private int idJugador;
     
     /**
      * Creates new form Ranking
@@ -96,13 +99,15 @@ public class Ranking extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         
+        rankingList.clear();
+
         //Abrir conexión con la Base de Datos
         BaseDeDatos bd = new BaseDeDatos();
         
         try 
         {
             // Preparar la sentencia
-            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM ranking");
+            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM ranking ORDER BY puntosObtenidos DESC");
 
             // Ejecutar la sentencia
             ResultSet resultado = sentencia.executeQuery(); 
@@ -126,11 +131,11 @@ public class Ranking extends javax.swing.JFrame {
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
-        this.setVisible(false);
-        Landing ventanaLanding = new Landing("");
-        ventanaLanding.setVisible(true);
-    }     
 
+        Landing ventanaLanding = new Landing(idJugador);
+        ventanaLanding.setVisible(true);
+        this.setVisible(false);
+    }
     /**
      * @param args the command line arguments
      */

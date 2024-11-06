@@ -10,11 +10,13 @@ package com.mycompany.proyecto_2do_isbo;
  */
 public class Partida extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Partida
-     */
-    public Partida() {
+    private int jugadorId;
+
+    public Partida(int jugadorId) {
         initComponents();
+
+        this.jugadorId = jugadorId;
+
     }
 
     /**
@@ -117,7 +119,7 @@ public class Partida extends javax.swing.JFrame {
 
     private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
         // TODO add your handling code here:
-        Juego ventanaJuego = new Juego();
+        Juego ventanaJuego = new Juego(jugadorId);
         ventanaJuego.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnIniciarActionPerformed
@@ -152,7 +154,7 @@ public class Partida extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Partida().setVisible(true);
+                //new Partida().setVisible(true);
             }
         });
     }

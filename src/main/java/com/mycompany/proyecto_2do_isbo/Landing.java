@@ -4,25 +4,64 @@
  */
 package com.mycompany.proyecto_2do_isbo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author ilucky
  */
 public class Landing extends javax.swing.JFrame {
     
+    private int jugadorId;
 
-    /**
-     * Creates new form landing
-     */
-    public Landing(String nombreCompleto) 
-    {
+    public Landing(int jugadorId) {
+        this.jugadorId = jugadorId;
         initComponents();
-        jLabel2.setText("Hola "+nombreCompleto);
+
+        ventanaLanding(jugadorId);
+
+
+
+        jLabel2.setText("Hola "+ holaNombre(jugadorId));
     }
 
-    public void ventanaLanding()
+    public void ventanaLanding(int id)
     {
-        initComponents();
+
+    }
+
+    private String holaNombre(int idJugador) {
+        
+        String nombreCompleto = "de vuelta";
+        BaseDeDatos bd = new BaseDeDatos();
+        Connection conexion = bd.getConnection();
+    
+        if (conexion != null) 
+        {
+            try 
+            {
+                String consulta = "SELECT nombreCompleto FROM jugador WHERE idJugador = ?";
+                PreparedStatement sentencia = conexion.prepareStatement(consulta);
+                sentencia.setInt(1, idJugador);
+                ResultSet resultado = sentencia.executeQuery();
+    
+                if (resultado.next()) 
+                {
+                    nombreCompleto = resultado.getString("nombreCompleto");
+                }
+            } 
+
+            catch (SQLException e) 
+            {       
+                JOptionPane.showMessageDialog(null, "Error al cargar el nombre del jugador: " + e.getMessage());
+            }
+        }
+        return nombreCompleto;
     }
 
 
@@ -139,7 +178,7 @@ public class Landing extends javax.swing.JFrame {
 
     private void btnNuevaPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaPartidaActionPerformed
         // TODO add your handling code here:
-        Partida ventanaPartida = new Partida();
+        Partida ventanaPartida = new Partida(jugadorId);
         ventanaPartida.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnNuevaPartidaActionPerformed

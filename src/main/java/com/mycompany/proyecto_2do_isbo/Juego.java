@@ -25,15 +25,18 @@ public class Juego extends javax.swing.JFrame {
     
     private int indiceRespuestaCorrecta;
     
-    private int idJugadorActivo = 1; //default
+    private int idJugadorActivo;
   
     BaseDeDatos baseDeDatos = new BaseDeDatos();
 
+    private int jugadorId;
     
-    
-    public Juego() 
+    public Juego(int jugadorId) 
     {
         initComponents();
+        this.jugadorId = jugadorId;
+        this.idJugadorActivo = jugadorId;
+
         cargarPreguntasYRespuestas();       
         cargarPreguntaAleatoria();
         iniciarTemporizador();
@@ -140,23 +143,21 @@ public class Juego extends javax.swing.JFrame {
             BaseDeDatos bd = new BaseDeDatos();
             PreparedStatement sentencia = bd.getConnection().prepareStatement("UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = ?");
 
-            int idJugador = idJugadorActivo;
-
-            sentencia.setInt(1, idJugador);
+            sentencia.setInt(1, idJugadorActivo);
 
             int filasActualizadas = sentencia.executeUpdate();
 
             // Verifica si se actualizO alguna fila
-            if (filasActualizadas > 0) 
-            {
-                JOptionPane.showMessageDialog(null, "Se han asignado 10 puntos al usuario con ID " + idJugador);
+            //if (filasActualizadas > 0) 
+            //{
+                //JOptionPane.showMessageDialog(null, "Se han asignado 10 puntos al usuario con ID " + idJugadorActivo);
 
-            }
+            //}
 
-            else 
-            {
-                JOptionPane.showMessageDialog(null, "No se encontró el usuario con ID " + idJugador);
-            }
+            //else 
+            //{
+                //JOptionPane.showMessageDialog(null, "No se encontró el usuario con ID " + idJugadorActivo);
+            //}
 
         }
         
@@ -342,7 +343,7 @@ public class Juego extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Juego().setVisible(true);
+                //new Juego().setVisible(true);
             }
         });
     }

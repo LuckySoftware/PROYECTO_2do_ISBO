@@ -1,8 +1,5 @@
 package com.mycompany.proyecto_2do_isbo;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 /**
@@ -198,47 +195,22 @@ public class Inicio extends javax.swing.JFrame {
         // TODO add your handling code here:
         
         String correoElectronico = txtEmail.getText();
-        String userPassword = String.valueOf(txtPassword.getPassword());        
-        //Crear la conexion
-        BaseDeDatos bd = new BaseDeDatos();
-        
-        //Preparar la sentencia a ejecutar
-        try 
+        String userPassword = String.valueOf(txtPassword.getPassword());
+    
+        Jugador jugador = Jugador.obtenerJugador(correoElectronico, userPassword);
+    
+        if (jugador != null) 
         {
-            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT count(*) FROM jugador WHERE correoElectronico = ? AND userPassword = ?");
-            sentencia.setString(1, correoElectronico);
-            sentencia.setString(2, userPassword);
-
-
-            ResultSet buscador = bd.ejecutarSQL(sentencia);
-
-            
-           // BUSCAR EL MATCH DENTRO DE LA TABLA
-           buscador.next();
-           int cantidad = buscador.getInt(1);
-           
-           
-           // RESULTANTE DEL BUSCADOR
-           if(cantidad == 1)
-           {
-               Landing ventanaLanding = new Landing(correoElectronico);
-               ventanaLanding.setVisible(true);
-               this.setVisible(false);
-           }
-           else
-           {
-               JOptionPane.showMessageDialog(null, "Datos erroneos, o jugador no existente");
-           }
-          
-        
-            
+            Landing ventanaLanding = new Landing(jugador.getId());
+            ventanaLanding.setVisible(true);
+            this.setVisible(false);
         }
-        catch(SQLException ex)
-        {
-            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
-            this.dispose();
-        } 
 
+        else 
+        {
+            // ERROR EN CASO DE DATOS ERRONEOS O JUGADOR NO EXISTE
+            JOptionPane.showMessageDialog(null, "Datos erróneos, o jugador no existente");
+        }
     }                                          
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {                                            

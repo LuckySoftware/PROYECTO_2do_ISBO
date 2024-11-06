@@ -4,15 +4,10 @@
  */
 package com.mycompany.proyecto_2do_isbo;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
-
-import com.sun.source.tree.Tree;
 
 /**
  *
@@ -20,8 +15,12 @@ import com.sun.source.tree.Tree;
  */
 public class Configuracion extends javax.swing.JFrame {
 
+    
+    private int jugadorId;
+
     public Configuracion(String nombreCompleto) 
     {
+        
         initComponents();
     }
 
@@ -145,9 +144,8 @@ public class Configuracion extends javax.swing.JFrame {
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
         // TODO add your handling code here:
-        String nombre = txtNombreCompleto.getText(); 
 
-        Landing ventanaLanding = new Landing(nombre);
+        Landing ventanaLanding = new Landing(jugadorId);
         ventanaLanding.setVisible(true);
         this.setVisible(false);
         
@@ -188,7 +186,7 @@ public class Configuracion extends javax.swing.JFrame {
 
         if (filasAfectadas > 0) 
         {
-            Landing ventanaLanding = new Landing(nombre);
+            Landing ventanaLanding = new Landing(Jugador.obtenerJugador(email, contra).getId());
             ventanaLanding.setVisible(true);
             this.setVisible(false);
         
