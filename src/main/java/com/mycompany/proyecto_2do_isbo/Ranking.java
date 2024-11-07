@@ -52,6 +52,11 @@ public class Ranking extends javax.swing.JFrame
         jScrollPane1.setViewportView(rankingList1);
 
         btnSalir.setText("Salir");
+        btnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalirActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Refrescar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -96,6 +101,14 @@ public class Ranking extends javax.swing.JFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
+        // TODO add your handling code here:
+        Landing ventanaLanding = new Landing(idJugador);
+        ventanaLanding.setVisible(true);
+        this.setVisible(false);
+        
+    }//GEN-LAST:event_btnSalirActionPerformed
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         
@@ -127,14 +140,6 @@ public class Ranking extends javax.swing.JFrame
         {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
-    }
-
-    private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        // TODO add your handling code here:
-
-        Landing ventanaLanding = new Landing(idJugador);
-        ventanaLanding.setVisible(true);
-        this.setVisible(false);
     }
     /**
      * @param args the command line arguments

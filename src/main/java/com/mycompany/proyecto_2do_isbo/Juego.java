@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.*;
 
@@ -27,6 +29,8 @@ public class Juego extends javax.swing.JFrame {
     
     private int idJugadorActivo;
   
+    private Set<Integer> preguntasRespondidas = new HashSet<>();
+    
     BaseDeDatos baseDeDatos = new BaseDeDatos();
 
     private int jugadorId;
@@ -42,59 +46,85 @@ public class Juego extends javax.swing.JFrame {
         iniciarTemporizador();
     }
     
+    
+    private int TotalPreguntas(Connection conexion) throws SQLException 
+    {
+        String consultaTotalPreguntas = "SELECT COUNT(*) AS total FROM pregunta";
+        Statement sentencia= conexion.createStatement();
+        ResultSet rs = sentencia.executeQuery(consultaTotalPreguntas);
+        if (rs.next()) 
+        {
+            return rs.getInt("total");
+        }
+        return 0;
+    }
+    
+    
     private void cargarPreguntaAleatoria() 
     {
         Connection conexion = baseDeDatos.getConnection();
-    
+
         if (conexion != null) 
         {
             try 
             {
-                // SELECCIONAMOS UNA PREGUNTA ALEATORIA
-                String consultaPregunta = "SELECT * FROM pregunta ORDER BY RAND() LIMIT 1";
-                Statement sentencia = conexion.createStatement();
-                ResultSet resultadoPregunta = sentencia.executeQuery(consultaPregunta);
-                
-                if (resultadoPregunta.next())
+                int idPregunta = -1;
+
+                while (true) 
                 {
-                    textoPregunta = resultadoPregunta.getString("textoPregunta");
-                    preguntaCorrecta = resultadoPregunta.getString("respuestaCorrecta"); 
-                    int idPregunta = resultadoPregunta.getInt("idPregunta");
+                    // PREGUNTA ALEATORIA
+                    String consultaDePregunta = "SELECT * FROM pregunta WHERE idPregunta NOT IN (SELECT idPregunta FROM pregunta WHERE idPregunta IN (SELECT idPregunta FROM pregunta WHERE idPregunta NOT IN (?))) ORDER BY RAND() LIMIT 1";
+                    PreparedStatement premisaPregunta = conexion.prepareStatement(consultaDePregunta);
                     
-                    // OBTENEMOS LAS OPCIONES DE RESPUESTA
-                    String consultaOpciones = "SELECT textoOpcion FROM opcionRespuesta WHERE idPregunta = ?";
-                    PreparedStatement premisa = conexion.prepareStatement(consultaOpciones);
-                    premisa.setInt(1, idPregunta);
-                    ResultSet resultadoOpciones = premisa.executeQuery();
-                    
-                    int i = 0;
-                    indiceRespuestaCorrecta = i;
-                    
-                    while (resultadoOpciones.next() && i < 4) 
-                    {
-                        String opcion = resultadoOpciones.getString("textoOpcion");
-                        opcionesRespuesta[i] = opcion;  
-                       
-                        if (opcion.equals(preguntaCorrecta)) 
-                        {
-                            indiceRespuestaCorrecta = i; // ALOJAR EL INDICE DE LA RESPUESTA CORRECTA (i)
-                        }
-                        
-                        i++;
+                    // SE FIJA SI HAY MAS PREGUNTAS PARA PREGUNTAR
+                    if (preguntasRespondidas.size() >= TotalPreguntas(conexion)) {
+                        JOptionPane.showMessageDialog(null, "No hay más preguntas disponibles.");
+                        return;
                     }
 
-                    // RELLENAMOS OPCIONES VACIAS
-                    while (i < 4) 
-                    {
-                        opcionesRespuesta[i] = "";
-                        i++;
+                    ResultSet resultadoPregunta = premisaPregunta.executeQuery();
+                    
+                    if (resultadoPregunta.next()) {
+                        textoPregunta = resultadoPregunta.getString("textoPregunta");
+                        preguntaCorrecta = resultadoPregunta.getString("respuestaCorrecta"); 
+                        idPregunta = resultadoPregunta.getInt("idPregunta");
+                        
+                        // AGREGARLE UN ID A LA PREGUNTA PARA IDENTIFICARLAS Y NO REPETIRLAS
+                        preguntasRespondidas.add(idPregunta);
+
+                        // OPCIONES DE RESPUESTA
+                        String consultaOpciones = "SELECT textoOpcion FROM opcionRespuesta WHERE idPregunta = ?";
+                        PreparedStatement premisaOpciones = conexion.prepareStatement(consultaOpciones);
+                        premisaOpciones.setInt(1, idPregunta);
+                        ResultSet resultadoOpciones = premisaOpciones.executeQuery();
+                        
+                        int i = 0;
+                        indiceRespuestaCorrecta = -1;
+
+                        while (resultadoOpciones.next() && i < 4) 
+                        {
+                            String opcion = resultadoOpciones.getString("textoOpcion");
+                            opcionesRespuesta[i] = opcion;   
+                            
+                            if (opcion.equals(preguntaCorrecta)) 
+                            {
+                                indiceRespuestaCorrecta = i;
+                            }
+                            i++;
+                        }
+
+                        // LLENA OPCIONES VACIAS SINO NO FUNCA (NO LO BORRES)
+                        while (i < 4) 
+                        {
+                            opcionesRespuesta[i] = "";
+                            i++;
+                        }
+                        break;
                     }
                 }
-
                 cargarPreguntasYRespuestas();
-              
             }
-
+            
             catch (SQLException e) 
             { 
                 JOptionPane.showMessageDialog(null, "ERROR AL CARGAR LA PREGUNTA: " + e.getMessage());
@@ -110,7 +140,8 @@ public class Juego extends javax.swing.JFrame {
         btn3.setText(opcionesRespuesta[2]);
         btn4.setText(opcionesRespuesta[3]);
     }
-
+    
+    
     private void iniciarTemporizador()
     {
         temporizador = new Timer();
@@ -147,7 +178,7 @@ public class Juego extends javax.swing.JFrame {
 
             int filasActualizadas = sentencia.executeUpdate();
 
-            // Verifica si se actualizO alguna fila
+            // VERIFICAR FILAS ACTUALIZADAS
             //if (filasActualizadas > 0) 
             //{
                 //JOptionPane.showMessageDialog(null, "Se han asignado 10 puntos al usuario con ID " + idJugadorActivo);

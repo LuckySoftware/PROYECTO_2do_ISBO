@@ -18,9 +18,9 @@ public class Configuracion extends javax.swing.JFrame {
     
     private int jugadorId;
 
-    public Configuracion(String nombreCompleto) 
+    public Configuracion(int jugadorId) 
     {
-        
+        this.jugadorId = jugadorId;
         initComponents();
     }
 
@@ -160,8 +160,8 @@ public class Configuracion extends javax.swing.JFrame {
         
     String nombre = txtNombreCompleto.getText(); 
     String email = txtEmail.getText();
-    String contra = String.valueOf(txtPassword.getPassword()); 
-    String id = String.valueOf(jugadorId);  
+    String contra = String.valueOf(txtPassword.getPassword());   
+    String id = String.valueOf(jugadorId);
 
     if (nombre.isEmpty() || email.isEmpty() || contra.isEmpty()) 
     {

@@ -171,7 +171,7 @@ public class Landing extends javax.swing.JFrame {
 
     private void btnConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigActionPerformed
         // TODO add your handling code here:
-        Configuracion ventanaConfiguracion = new Configuracion("");
+        Configuracion ventanaConfiguracion = new Configuracion(jugadorId);
         ventanaConfiguracion.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnConfigActionPerformed
