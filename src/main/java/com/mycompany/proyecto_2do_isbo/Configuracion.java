@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 public class Configuracion extends javax.swing.JFrame {
 
     
-    private int jugadorId;
+    public int jugadorId;
 
     public Configuracion(int jugadorId) 
     {

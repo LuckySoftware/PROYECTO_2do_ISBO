@@ -24,7 +24,8 @@ public class Ranking extends javax.swing.JFrame
     /**
      * Creates new form Ranking
      */
-    public Ranking() {
+    public Ranking() 
+    {
         initComponents();
     }
 
@@ -120,7 +121,7 @@ public class Ranking extends javax.swing.JFrame
         try 
         {
             // Preparar la sentencia
-            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM ranking ORDER BY puntosObtenidos DESC");
+            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT r.*, j.nombreCompleto FROM ranking r JOIN jugador j ON r.idJugador = j.idJugador ORDER BY r.puntosObtenidos DESC");
 
             // Ejecutar la sentencia
             ResultSet resultado = sentencia.executeQuery(); 
@@ -128,10 +129,10 @@ public class Ranking extends javax.swing.JFrame
             // Recorrer el resultado
             while (resultado.next()) 
             {
-                String idRanking = resultado.getString("idRanking");
                 String idJugador = resultado.getString("idJugador");
                 String puntosObtenidos = resultado.getString("puntosObtenidos");
-                rankingList.addElement("Ranking: " +idRanking+ " | Jugador: " +idJugador+ " | Puntos: " +puntosObtenidos);
+                String nombreCompleto = resultado.getString("nombreCompleto");
+                rankingList.addElement(" | ID: " +idJugador+ "| Jugador: "+ nombreCompleto + " | Puntos: " +puntosObtenidos);
             }
         
         }

@@ -65,4 +65,43 @@ public class Jugador
         }
         return jugador;
     }
+    
+    public static Jugador obtenerJugadorPorId(int idJugador) {
+    PreparedStatement sentencia = null;
+    ResultSet resultSet = null;
+    Jugador jugador = null;
+
+    try {
+        // CONEXION A LA DB
+        BaseDeDatos db = new BaseDeDatos();
+        sentencia = db.getConnection().prepareStatement("SELECT idJugador, correoElectronico, nombreCompleto FROM jugador WHERE idJugador = ?");
+        sentencia.setInt(1, idJugador);
+        resultSet = sentencia.executeQuery();
+
+        if (resultSet.next()) {
+            // SI EXISTE Y ENCUENTRA UN JUGADOR CREA UNA NUEVA INSTANCIA
+            jugador = new Jugador(resultSet.getInt("idJugador"), resultSet.getString("correoElectronico"));
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        // Cerrar recursos
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        if (sentencia != null) {
+            try {
+                sentencia.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    return jugador;
+}
 }
