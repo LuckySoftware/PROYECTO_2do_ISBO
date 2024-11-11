@@ -202,8 +202,21 @@ public class Inicio extends javax.swing.JFrame {
         if (jugador != null) 
         {
             Landing ventanaLanding = new Landing(jugador.getId());
-            ventanaLanding.setVisible(true);
-            this.setVisible(false);
+
+            
+            if (correoElectronico.equals("admin") && userPassword.equals("admin"))
+            {
+                PanelAdmin ventanaPanelAdmin = new PanelAdmin();
+                ventanaPanelAdmin.setVisible(true);
+                this.setVisible(false);
+            }
+            
+            else
+            {
+            
+                ventanaLanding.setVisible(true);
+                this.setVisible(false);
+            }
         }
 
         else 
@@ -220,9 +233,7 @@ public class Inicio extends javax.swing.JFrame {
 
     private void btnRegistrarmeActionPerformed(java.awt.event.ActionEvent evt) {                                               
         // TODO add your handling code here:
-        Registro ventanaRegistro = new Registro();
-        ventanaRegistro.setVisible(true);
-        this.setVisible(false);
+        JOptionPane.showMessageDialog(null, "Opcion solo de admins");
     }                                              
 
     /**

@@ -4,8 +4,11 @@
  */
 package com.mycompany.proyecto_2do_isbo;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
@@ -51,7 +54,6 @@ public class Registro extends javax.swing.JFrame {
         txtPassword = new javax.swing.JPasswordField();
         btnCancelar = new javax.swing.JButton();
         btnAceptar = new javax.swing.JButton();
-        jLabel10 = new javax.swing.JLabel();
         boxSexo = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -128,8 +130,6 @@ public class Registro extends javax.swing.JFrame {
             }
         });
 
-        jLabel10.setText("¿Ya tienes una cuenta?");
-
         boxSexo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Hombre", "Mujer" }));
         boxSexo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -183,13 +183,8 @@ public class Registro extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(29, 29, 29))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(146, 146, 146)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jLabel10)))
+                .addGap(146, 146, 146)
+                .addComponent(jLabel2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -229,9 +224,7 @@ public class Registro extends javax.swing.JFrame {
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
                 .addComponent(jLabel4)
-                .addGap(49, 49, 49)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(72, 72, 72)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnAceptar))
@@ -269,10 +262,11 @@ public class Registro extends javax.swing.JFrame {
         
          String contra = String.valueOf(txtPassword.getPassword());   
         
-        //Obtener los datos de todas las personas menos "de"
         try
         {
-            PreparedStatement sentencia = bd.getConnection().prepareStatement("INSERT INTO jugador (nombreCompleto, sexo, fechaNacimiento, paisNacimiento, paisResidencia, correoElectronico, userPassword) VALUES (?, ?, ?, ?, ?, ?, ?)");
+          Connection connection = bd.getConnection();
+            
+            PreparedStatement sentencia = bd.getConnection().prepareStatement("INSERT INTO jugador (nombreCompleto, sexo, fechaNacimiento, paisNacimiento, paisResidencia, correoElectronico, userPassword) VALUES (?, ?, ?, ?, ?, ?, ?), Statement.RETURN_GENERATED_KEYS");
             sentencia.setString(1, txtNombreCompleto.getText());
             sentencia.setString(2, (String) sexoBox.getSelectedItem());
             sentencia.setString(3, txtFechaNacimiento.getText());
@@ -280,11 +274,21 @@ public class Registro extends javax.swing.JFrame {
             sentencia.setString(5, txtPaisResidencia.getText());
             sentencia.setString(6, txtCorreoElectronico.getText());
             sentencia.setString(7, contra);   
+  
+            sentencia.executeUpdate();
 
-            //ejecutar sentencia
-            bd.ejecutar(sentencia);
+            ResultSet resultado = sentencia.getGeneratedKeys();
+            if (resultado.next()) 
+            {
+                long jugadorID = resultado.getLong(1);
 
-        }catch(SQLException e)
+                PreparedStatement rankingSentencia = connection.prepareStatement("INSERT INTO ranking (idJugador) VALUES (?)");
+                rankingSentencia.setLong(1, jugadorID);
+                rankingSentencia.executeUpdate();
+            }
+            
+        }
+        catch(SQLException e)
             
         {
             JOptionPane.showMessageDialog
@@ -292,9 +296,9 @@ public class Registro extends javax.swing.JFrame {
         }
 
 
-        Inicio ventanaInicio = new Inicio();
+        PanelAdmin ventanaPanelAdmin = new PanelAdmin();
         this.setVisible(false);
-        ventanaInicio.setVisible(true);
+        ventanaPanelAdmin.setVisible(true);
         
     }//GEN-LAST:event_btnAceptarActionPerformed
 
@@ -304,9 +308,9 @@ public class Registro extends javax.swing.JFrame {
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         // TODO add your handling code here:
-        Inicio ventanaInicio = new Inicio();
+        PanelAdmin ventanaPanelAdmin= new PanelAdmin();
         this.setVisible(false);
-        ventanaInicio.setVisible(true);
+        ventanaPanelAdmin.setVisible(true);
         
     }//GEN-LAST:event_btnCancelarActionPerformed
 
@@ -350,7 +354,6 @@ public class Registro extends javax.swing.JFrame {
     private javax.swing.JButton btnAceptar;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

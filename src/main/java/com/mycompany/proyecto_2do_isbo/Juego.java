@@ -1,15 +1,15 @@
 package com.mycompany.proyecto_2do_isbo;
 
 
+
+// LOS IMPORTES DE TODAS LAS CLASES
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -47,9 +47,12 @@ public class Juego extends javax.swing.JFrame {
 
     private int jugadorId;
     
+    public int cantidadPreguntas = 4;
+    
     public Juego(int jugadorId) 
     {
         initComponents();
+        
         this.jugadorId = jugadorId;
         this.idJugadorActivo = jugadorId;
 
@@ -59,17 +62,19 @@ public class Juego extends javax.swing.JFrame {
     }
 
     
+    
     private void cargarPreguntaAleatoria() 
     {
-    Connection conexion = baseDeDatos.getConnection();
+     Connection conexion = baseDeDatos.getConnection();
 
     if (conexion != null) 
     {
     
         try 
         {
-            if (preguntasRespondidasContador >= 4) {
-                JOptionPane.showMessageDialog(null, "Juego terminado. Has respondido 4 preguntas.");
+            if (preguntasRespondidasContador >= cantidadPreguntas) 
+            {
+                JOptionPane.showMessageDialog(null, "Juego terminado, respondiste todas las preguntas");
                 preguntasRespondidasContador = 0;
 
                 Final ventanaFinal = new Final(jugadorId);
@@ -78,14 +83,18 @@ public class Juego extends javax.swing.JFrame {
                 return;
             }
 
+            
             String consultaDePregunta = "SELECT * FROM pregunta WHERE idPregunta NOT IN (SELECT idPregunta FROM pregunta WHERE idPregunta IN (?)) ORDER BY RAND() LIMIT 1";
             PreparedStatement premisaPregunta = conexion.prepareStatement(consultaDePregunta);
 
+            // CONSTRUIR LOS TEXTOS DE MANERA EFICIENTE
             StringBuilder idsRespondidas = new StringBuilder();
-            for (Integer id : preguntasRespondidas) {
+            for (Integer id : preguntasRespondidas) 
+            {
                 idsRespondidas.append(id).append(",");
             }
 
+            
             if (idsRespondidas.length() > 0) {
                 idsRespondidas.setLength(idsRespondidas.length() - 1);
             }
@@ -93,7 +102,10 @@ public class Juego extends javax.swing.JFrame {
             premisaPregunta.setString(1, idsRespondidas.toString());
             ResultSet resultadoPregunta = premisaPregunta.executeQuery();
 
-            if (resultadoPregunta.next()) {
+            
+            // SELECCIONAR LAS PREGUNTAS JUNTO A LOS TEXTOS
+            if (resultadoPregunta.next()) 
+            {
                 idPregunta = resultadoPregunta.getInt("idPregunta");
                 textoPregunta = resultadoPregunta.getString("textoPregunta");
 
@@ -103,60 +115,76 @@ public class Juego extends javax.swing.JFrame {
                 ResultSet resultadoOpciones = premisaOpciones.executeQuery();
 
                 List<String> opciones = new ArrayList<>();
-                respuestaCorrecta = ""; // Reiniciar la respuesta correcta antes de cargar una nueva pregunta
-                int indiceRespuestaCorrecta = -1; // Para almacenar el índice de la respuesta correcta
+                respuestaCorrecta = "";
+                int indiceRespuestaCorrecta = -1;
 
-                // Obtener opciones de respuesta y guardar la respuesta correcta
-                while (resultadoOpciones.next()) {
+                
+                // OBTENER LAS OPCIONES DE RESPUESTA Y LA RESPUESTA CORRECTA
+                while (resultadoOpciones.next()) 
+                {
                     String textoOpcion = resultadoOpciones.getString("textoOpcion");
                     boolean esCorrecta = resultadoOpciones.getBoolean("esCorrecta");
 
+                    
                     opciones.add(textoOpcion);
-                    if (esCorrecta) {
-                        respuestaCorrecta = textoOpcion; // Guardar la respuesta correcta
-                        indiceRespuestaCorrecta = opciones.size() - 1; // Guardar el índice de la respuesta correcta
+                    if (esCorrecta) 
+                    {
+                        respuestaCorrecta = textoOpcion;
+                        indiceRespuestaCorrecta = opciones.size() - 1;
                     }
                 }
 
-                // Asegurarse de que la respuesta correcta esté entre las opciones
-                if (!respuestaCorrecta.isEmpty() && !opciones.contains(respuestaCorrecta)) {
-                    opciones.add(respuestaCorrecta); // Agregar la respuesta correcta si no está
+                
+                // ASEGURARSE DE QUE LA RESPUESTA CORRECTA ESTE DENTRO DE LAS OPCIONES
+                // EN CASO DE NO ESTAR SE AGREGA
+                if (!respuestaCorrecta.isEmpty() && !opciones.contains(respuestaCorrecta)) 
+                {
+                    opciones.add(respuestaCorrecta); 
                 }
 
-                // Mezclar las opciones
+                // MEZCLAR LAS OPCIONES
                 Collections.shuffle(opciones);
 
-                // Asignar las opciones a un array para que pueda ser utilizado por cargarPreguntasYRespuestas
-                for (int i = 0; i < opcionesRespuesta.length; i++) {
-                    opcionesRespuesta[i] = (i < opciones.size()) ? opciones.get(i) : ""; // Asigna las opciones o vacío si no hay más opciones
+                // ASIGNAR LAS OPCIONES A UN ARRAY 
+                for (int i = 0; i < opcionesRespuesta.length; i++) 
+                {
+                    opcionesRespuesta[i] = (i < opciones.size()) ? opciones.get(i) : "";
                 }
 
-                // Actualiza el texto de la pregunta y las opciones
                 cargarPreguntasYRespuestas(opcionesRespuesta, textoPregunta);
 
-                // Agregar la pregunta a la lista de preguntas respondidas
                 preguntasRespondidas.add(idPregunta);
                 preguntasRespondidasContador++;
 
-                // Guardar el índice de la respuesta correcta
-                this.indiceRespuestaCorrecta = indiceRespuestaCorrecta; // Asegúrate de tener esta variable en tu clase
-            } else {
-                JOptionPane.showMessageDialog(null, "No hay más preguntas disponibles.");
+                
+                // GUARDAR EL indice DE LA RESPUESTA CORRECTA
+                this.indiceRespuestaCorrecta = indiceRespuestaCorrecta;
+            }
+            
+            else 
+            {
+                JOptionPane.showMessageDialog(null, "No hay mas preguntas");
             }
 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al cargar la pregunta: " + e.getMessage());
+        }
+        
+        catch (SQLException e) 
+        {
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
     }
 }
 
-private void cargarPreguntasYRespuestas(String[] opcionesRespuesta, String textoPregunta) {
-    labelParrafo.setText(textoPregunta);
-    btn1.setText(opcionesRespuesta.length > 0 ? opcionesRespuesta[0] : "");
-    btn2.setText(opcionesRespuesta.length > 1 ? opcionesRespuesta[1] : "");
-    btn3.setText(opcionesRespuesta.length > 2 ? opcionesRespuesta[2] : "");
-    btn4.setText(opcionesRespuesta.length > 3 ? opcionesRespuesta[3] : "");
-}
+    private void cargarPreguntasYRespuestas(String[] opcionesRespuesta, String textoPregunta) 
+    {
+    
+        labelParrafo.setText(textoPregunta);
+        btn1.setText(opcionesRespuesta.length > 0 ? opcionesRespuesta[0] : "");
+        btn2.setText(opcionesRespuesta.length > 1 ? opcionesRespuesta[1] : "");
+        btn3.setText(opcionesRespuesta.length > 2 ? opcionesRespuesta[2] : "");
+        btn4.setText(opcionesRespuesta.length > 3 ? opcionesRespuesta[3] : "");
+    
+    }
     
     
     private void iniciarTemporizador()
@@ -179,111 +207,120 @@ private void cargarPreguntasYRespuestas(String[] opcionesRespuesta, String texto
         }, 1000, 1000);
     }
     
-    private void respuesta(int indiceSeleccionado) {
-    // Detener el temporizador
-    temporizador.cancel();
+    
+    private void respuesta(int indiceSeleccionado) 
+    {
 
-    // Verificar si la respuesta seleccionada es correcta
-    boolean esCorrecta = opcionesRespuesta[indiceSeleccionado].equals(respuestaCorrecta);
+        
+        temporizador.cancel();
 
-    // Conectar a la base de datos y actualizar los puntos
-    Connection conexion = null;
-    try {
-        BaseDeDatos bd = new BaseDeDatos();
-        conexion = bd.getConnection();
+        // VERIFICACION DE LA RESPUESTA A VER SI ES CORRECTA 
+        boolean esCorrecta = opcionesRespuesta[indiceSeleccionado].equals(respuestaCorrecta);
 
-        if (conexion != null) {
-            // Solo sumar puntos si la respuesta es correcta
-            if (esCorrecta) {
-                // Preparar la sentencia para actualizar los puntos
-                String sql = "UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = ?";
-                PreparedStatement sentencia = conexion.prepareStatement(sql);
-                sentencia.setInt(1, idJugadorActivo);
+        Connection conexion = null;
+    
+        try 
+        {
+        
+            BaseDeDatos bd = new BaseDeDatos();
+            conexion = bd.getConnection();
 
-                int filasActualizadas = sentencia.executeUpdate();
+            if (conexion != null) 
+            {    
+            
+                // SI ES CORRECTA LA RESPUESTA LE SUMA LOS PUNTOS
+                if (esCorrecta) 
+                {
+                    String sql = "UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = ?";
+                    PreparedStatement sentencia = conexion.prepareStatement(sql);
+                    sentencia.setInt(1, idJugadorActivo);
 
-                // Verificar si se actualizaron filas
-                if (filasActualizadas > 0) {
-                    JOptionPane.showMessageDialog(null, "Se han asignado 10 puntos al usuario con ID " +  jugadorId);
-                } else {
-                    JOptionPane.showMessageDialog(null, "No se encontró el usuario con ID " +  jugadorId);
+                    int verificar = sentencia.executeUpdate();
+
+                    // VERIFICAR A MODO DE DESAROLLADOR ( ! IMPORTANTE: SACAR DESPUES ! )
+                    /*if (verificar > 0) 
+                    {
+                        //JOptionPane.showMessageDialog(null, "Se sumaron 10 puntos a ID: " +  jugadorId);
+                    }
+                    else 
+                    {
+                        JOptionPane.showMessageDialog(null, "No se encontra el ID: " +  jugadorId);
+                    }*/
                 }
-            } else {
-                JOptionPane.showMessageDialog(null, "Respuesta incorrecta. No se han sumado puntos.");
+            
+                else 
+                {
+                    JOptionPane.showMessageDialog(null, "Respuesta incorrecta");
+                }
+
+                // RECARGAR TODO
+                tiempoRestante = 11;
+                iniciarTemporizador();
+                cargarPreguntaAleatoria();
+
             }
-
-            // Reiniciar el temporizador para la próxima pregunta
-            tiempoRestante = 11;
-            iniciarTemporizador();
-
-            // Cargar una nueva pregunta aleatoria
-            cargarPreguntaAleatoria();
-
-        }
 
             else 
             {
                 JOptionPane.showMessageDialog(null, "Error al conectar a la base de datos.");
             }
-       }   
-            catch (SQLException e) 
-            {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
-            }
-    
-    }
-    
-    
-    
-    
-        public void nuevaPartida() 
+        }   
+        catch (SQLException e) 
         {
-            BaseDeDatos bd = new BaseDeDatos();
-            Connection conexion = null; 
-
-            // FECHA Y HORA DE AHORA MISMO
-            LocalDateTime date = LocalDateTime.now();
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String fecha= date.format(formato);
-            LocalTime horaComienza = LocalTime.now();
-            
-            
-            String estado = "En curso";
-            
-            String query = "INSERT INTO partida (fecha, horaComienza, estado) VALUES (?, ?, ?)";
-
-                conexion = bd.getConnection();
-                try (PreparedStatement sentencia = conexion.prepareStatement(query)) 
-                {
-                    // PARAMETROS
-                    sentencia.setString(1, fecha);
-                    sentencia.setObject(2, horaComienza);
-                    sentencia.setString(3, estado);
-
-                    // Ejecutar la inserción
-                    int filasInsertadas = sentencia.executeUpdate();
-                    
-                    if (filasInsertadas > 0) 
-                    {
-                        JOptionPane.showMessageDialog(null, "Partida insertada correctamente.");
-                    }
-                    
-                    else 
-                    {
-                    JOptionPane.showMessageDialog(null, "Error al insertar la partida.");
-                    }
-            }
-            
-            catch (SQLException e) 
-            {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
-            }
         }
+   } 
+    
+    
+    
+    
+    public void nuevaPartida() 
+    {
+        BaseDeDatos bd = new BaseDeDatos();
+        Connection conexion = null; 
+
+        // FECHA Y HORA DE AHORA MISMO
+        LocalDateTime date = LocalDateTime.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String fecha= date.format(formato);
+        LocalTime horaComienza = LocalTime.now();
+            
+            
+        String estado = "En curso";
+            
+        String query = "INSERT INTO partida (fecha, horaComienza, estado) VALUES (?, ?, ?)";
+
+        conexion = bd.getConnection();
+        try (PreparedStatement sentencia = conexion.prepareStatement(query)) 
+        {
+              
+            sentencia.setString(1, fecha);
+            sentencia.setObject(2, horaComienza);
+            sentencia.setString(3, estado);
+
+            int filasInsertadas = sentencia.executeUpdate();
+                    
+            if (filasInsertadas > 0) 
+            {
+                JOptionPane.showMessageDialog(null, "Partida insertada correctamente.");
+            }
+                    
+            else 
+            {
+                JOptionPane.showMessageDialog(null, "Error al insertar la partida.");
+            }
+            
+        }
+            
+        catch (SQLException e) 
+        {
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        }
+    }
         
         
     private void initComponents() 
     {
-
         jLabel1 = new javax.swing.JLabel();
         btn1 = new javax.swing.JButton();
         btn2 = new javax.swing.JButton();

@@ -46,7 +46,7 @@ public class Final extends javax.swing.JFrame {
         
         catch (SQLException e) 
         {
-        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
     }
 
