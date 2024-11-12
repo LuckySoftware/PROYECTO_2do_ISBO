@@ -1,81 +1,89 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.mycompany.proyecto_2do_isbo;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author ilucky
- */
 public class Final extends javax.swing.JFrame {
 
-    public int jugadorId;
-    public String id = String.valueOf(jugadorId);
-    
-    public Final(int jugadorId) 
+    private int jugadorId;
+    private int idPartida;
+
+    public Final(int jugadorId, int idPartida) 
     {
         this.jugadorId = jugadorId;
+        this.idPartida = idPartida;
         initComponents();
         mostrarPuntos();
         mostrarTiempo();
     }
 
-    private void mostrarPuntos() {
+    private void mostrarPuntos() 
+    {
         BaseDeDatos bd = new BaseDeDatos();
-    
-        try 
-        {
-            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM ranking WHERE idJugador = ? LIMIT 1");
-            sentencia.setInt(1, jugadorId);
+        String query = "SELECT puntosObtenidos FROM ranking WHERE idJugador = ? LIMIT 1";
 
-            ResultSet resultadoFinal = sentencia.executeQuery(); 
-        
+        try (Connection conexion = bd.getConnection();
+             PreparedStatement sentencia = conexion.prepareStatement(query)) 
+        {
+            sentencia.setInt(1, jugadorId);
+            ResultSet resultadoFinal = sentencia.executeQuery();
 
             if (resultadoFinal.next()) 
             {
                 String puntosObtenidos = resultadoFinal.getString("puntosObtenidos");
                 labelPuntos.setText(puntosObtenidos);
             }
+            
+            else 
+            {
+                labelPuntos.setText("0");
+            }
+            
         }
         
         catch (SQLException e) 
         {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
-    
     private void mostrarTiempo() 
     {
         BaseDeDatos bd = new BaseDeDatos();
-    
-        try 
+        String query = "SELECT horaComienza, horaFinalizacion FROM partida WHERE idPartida = ? LIMIT 1";
+
+        try (Connection conexion = bd.getConnection();
+             PreparedStatement sentencia = conexion.prepareStatement(query)) 
         {
-            PreparedStatement sentencia = bd.getConnection().prepareStatement("SELECT * FROM partida WHERE idPartida = 1 LIMIT 1");
-        
-            ResultSet resultadoFinal = sentencia.executeQuery(); 
-        
+            sentencia.setInt(1, idPartida);
+            ResultSet resultadoFinal = sentencia.executeQuery();
+
             if (resultadoFinal.next()) 
             {
                 String tiempoComienzo = resultadoFinal.getString("horaComienza");
                 String tiempoFin = resultadoFinal.getString("horaFinalizacion");
-            
+
                 labelTiempoInicio.setText(tiempoComienzo);
                 labelTiempoFinal.setText(tiempoFin);
+            } 
+            
+            else
+            {
+                labelTiempoInicio.setText("N/A");
+                labelTiempoFinal.setText("N/A");
             }
         } 
         
         catch (SQLException e) 
         {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
+
+    
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

@@ -2,7 +2,6 @@ package com.mycompany.proyecto_2do_isbo;
 
 
 
-// LOS IMPORTES DE TODAS LAS CLASES
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -10,9 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,9 +33,9 @@ public class Juego extends javax.swing.JFrame {
     
     private String[] opcionesRespuesta = new String[4];
     
-    private int indiceRespuestaCorrecta;
-    
     private int idJugadorActivo;
+    
+    public int indiceRespuestaCorrecta;
     
     public int preguntasRespondidasContador = 0;
   
@@ -49,6 +47,8 @@ public class Juego extends javax.swing.JFrame {
     
     public int cantidadPreguntas = 4;
     
+    private int idPartida;
+    
     public Juego(int jugadorId) 
     {
         initComponents();
@@ -59,50 +59,48 @@ public class Juego extends javax.swing.JFrame {
         cargarPreguntasYRespuestas(opcionesRespuesta, textoPregunta);
         cargarPreguntaAleatoria();
         iniciarTemporizador();
+        
+        nuevaPartida();
     }
 
     
     
-    private void cargarPreguntaAleatoria() 
-    {
-     Connection conexion = baseDeDatos.getConnection();
+private void cargarPreguntaAleatoria() 
+{
+    Connection conexion = baseDeDatos.getConnection();
 
     if (conexion != null) 
     {
-    
         try 
         {
             if (preguntasRespondidasContador >= cantidadPreguntas) 
             {
-                JOptionPane.showMessageDialog(null, "Juego terminado, respondiste todas las preguntas");
+                finalizarPartida();
                 preguntasRespondidasContador = 0;
 
-                Final ventanaFinal = new Final(jugadorId);
+                Final ventanaFinal = new Final(jugadorId, idPartida);
                 ventanaFinal.setVisible(true);
                 this.setVisible(false);
                 return;
             }
 
-            
             String consultaDePregunta = "SELECT * FROM pregunta WHERE idPregunta NOT IN (SELECT idPregunta FROM pregunta WHERE idPregunta IN (?)) ORDER BY RAND() LIMIT 1";
             PreparedStatement premisaPregunta = conexion.prepareStatement(consultaDePregunta);
 
             // CONSTRUIR LOS TEXTOS DE MANERA EFICIENTE
             StringBuilder idsRespondidas = new StringBuilder();
-            for (Integer id : preguntasRespondidas) 
-            {
+            for (Integer id : preguntasRespondidas) {
                 idsRespondidas.append(id).append(",");
             }
 
-            
-            if (idsRespondidas.length() > 0) {
+            if (idsRespondidas.length() > 0) 
+            {
                 idsRespondidas.setLength(idsRespondidas.length() - 1);
             }
 
             premisaPregunta.setString(1, idsRespondidas.toString());
             ResultSet resultadoPregunta = premisaPregunta.executeQuery();
 
-            
             // SELECCIONAR LAS PREGUNTAS JUNTO A LOS TEXTOS
             if (resultadoPregunta.next()) 
             {
@@ -118,28 +116,24 @@ public class Juego extends javax.swing.JFrame {
                 respuestaCorrecta = "";
                 int indiceRespuestaCorrecta = -1;
 
-                
                 // OBTENER LAS OPCIONES DE RESPUESTA Y LA RESPUESTA CORRECTA
                 while (resultadoOpciones.next()) 
                 {
                     String textoOpcion = resultadoOpciones.getString("textoOpcion");
                     boolean esCorrecta = resultadoOpciones.getBoolean("esCorrecta");
 
-                    
                     opciones.add(textoOpcion);
-                    if (esCorrecta) 
-                    {
+                    if (esCorrecta) {
                         respuestaCorrecta = textoOpcion;
                         indiceRespuestaCorrecta = opciones.size() - 1;
                     }
                 }
 
-                
                 // ASEGURARSE DE QUE LA RESPUESTA CORRECTA ESTE DENTRO DE LAS OPCIONES
                 // EN CASO DE NO ESTAR SE AGREGA
                 if (!respuestaCorrecta.isEmpty() && !opciones.contains(respuestaCorrecta)) 
                 {
-                    opciones.add(respuestaCorrecta); 
+                    opciones.add(respuestaCorrecta);
                 }
 
                 // MEZCLAR LAS OPCIONES
@@ -156,14 +150,8 @@ public class Juego extends javax.swing.JFrame {
                 preguntasRespondidas.add(idPregunta);
                 preguntasRespondidasContador++;
 
-                
                 // GUARDAR EL indice DE LA RESPUESTA CORRECTA
                 this.indiceRespuestaCorrecta = indiceRespuestaCorrecta;
-            }
-            
-            else 
-            {
-                JOptionPane.showMessageDialog(null, "No hay mas preguntas");
             }
 
         }
@@ -221,7 +209,6 @@ public class Juego extends javax.swing.JFrame {
     
         try 
         {
-        
             BaseDeDatos bd = new BaseDeDatos();
             conexion = bd.getConnection();
 
@@ -235,17 +222,7 @@ public class Juego extends javax.swing.JFrame {
                     PreparedStatement sentencia = conexion.prepareStatement(sql);
                     sentencia.setInt(1, idJugadorActivo);
 
-                    int verificar = sentencia.executeUpdate();
-
-                    // VERIFICAR A MODO DE DESAROLLADOR ( ! IMPORTANTE: SACAR DESPUES ! )
-                    /*if (verificar > 0) 
-                    {
-                        //JOptionPane.showMessageDialog(null, "Se sumaron 10 puntos a ID: " +  jugadorId);
-                    }
-                    else 
-                    {
-                        JOptionPane.showMessageDialog(null, "No se encontra el ID: " +  jugadorId);
-                    }*/
+                    sentencia.executeUpdate();
                 }
             
                 else 
@@ -276,46 +253,66 @@ public class Juego extends javax.swing.JFrame {
     
     public void nuevaPartida() 
     {
-        BaseDeDatos bd = new BaseDeDatos();
-        Connection conexion = null; 
+        Connection conexion = null;
 
         // FECHA Y HORA DE AHORA MISMO
-        LocalDateTime date = LocalDateTime.now();
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String fecha= date.format(formato);
-        LocalTime horaComienza = LocalTime.now();
-            
-            
+        LocalDateTime ahora = LocalDateTime.now();
+        Timestamp horaComienza = Timestamp.valueOf(ahora);
         String estado = "En curso";
-            
-        String query = "INSERT INTO partida (fecha, horaComienza, estado) VALUES (?, ?, ?)";
 
-        conexion = bd.getConnection();
-        try (PreparedStatement sentencia = conexion.prepareStatement(query)) 
-        {
-              
-            sentencia.setString(1, fecha);
-            sentencia.setObject(2, horaComienza);
-            sentencia.setString(3, estado);
+        String query = "INSERT INTO partida (horaComienza, estado) VALUES (?, ?)";
+
+        conexion = baseDeDatos.getConnection();
+        try (PreparedStatement sentencia = conexion.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            sentencia.setTimestamp(1, horaComienza);
+            sentencia.setString(2, estado);
 
             int filasInsertadas = sentencia.executeUpdate();
-                    
+
             if (filasInsertadas > 0) 
             {
-                JOptionPane.showMessageDialog(null, "Partida insertada correctamente.");
-            }
-                    
+                // Obtener el ID de la partida insertada
+                ResultSet generatedKeys = sentencia.getGeneratedKeys();
+                if (generatedKeys.next()) 
+                {
+                    idPartida = generatedKeys.getInt(1);
+                }
+            } 
             else 
             {
-                JOptionPane.showMessageDialog(null, "Error al insertar la partida.");
+                JOptionPane.showMessageDialog(null, "Error al iniciar la partida.");
             }
-            
-        }
-            
+
+        } 
         catch (SQLException e) 
         {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
+    }
+
+    public void finalizarPartida() 
+    {
+        Connection conexion = null;
+
+        // FECHA Y HORA DE AHORA MISMO
+        LocalDateTime ahora = LocalDateTime.now();
+        Timestamp horaFinalizacion = Timestamp.valueOf(ahora);
+
+        String query = "UPDATE partida SET horaFinalizacion = ?, estado = ? WHERE idPartida = ?";
+
+        conexion = baseDeDatos.getConnection();
+        try (PreparedStatement sentencia = conexion.prepareStatement(query)) 
+        {
+            sentencia.setTimestamp(1, horaFinalizacion);
+            sentencia.setString(2, "Finalizada");
+            sentencia.setInt(3, idPartida);
+
+            sentencia.executeUpdate();
+        } 
+        catch (SQLException e) 
+        {
+        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        } 
     }
         
         

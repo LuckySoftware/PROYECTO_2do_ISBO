@@ -88,7 +88,6 @@ public class BaseDeDatos
         
 
         // SACAR EL ID DE JUGADOR
-
         public ResultSet identificador(PreparedStatement sql)
         {
 
