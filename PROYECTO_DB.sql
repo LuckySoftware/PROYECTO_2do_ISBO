@@ -20,6 +20,7 @@ CREATE TABLE jugador (
 -- DESCRIBE jugador;
 -- DROP TABLE jugador;
 SELECT * FROM jugador;
+INSERT INTO jugador (nombreCompleto, correoElectronico, userPassword) VALUES ("admin", "admin", "admin");
 
 -- TABLA DE PARTIDA
 CREATE TABLE partida (
@@ -27,10 +28,10 @@ CREATE TABLE partida (
     fecha DATE,
     horaComienza TIME,
     horaFinalizacion TIME,
-    estado VARCHAR(25)
+    estado ENUM('En curso', 'Finalizada')
 );
 
-
+SELECT * FROM partida;
 
 -- TABLA DE JUEGO (PARTIDA - JUGADOR)
 CREATE TABLE juega (
@@ -60,8 +61,13 @@ CREATE TABLE categoria (
     nombre VARCHAR(20),
     descripcion VARCHAR(100)
 );
+
+
 -- drop table categoria;
 -- TABLA DE PREGUNTAS
+
+
+
 CREATE TABLE pregunta (
     idPregunta int AUTO_INCREMENT ,
     idCategoria INT,
@@ -71,7 +77,7 @@ CREATE TABLE pregunta (
     PRIMARY KEY(idPregunta),
     FOREIGN KEY(idCategoria) REFERENCES categoria(idCategoria)
 );
-
+SELECT * FROM pregunta;
 
 
 -- TABLA DE OPCION DE RESPUESTAS
@@ -84,7 +90,6 @@ CREATE TABLE opcionRespuesta (
 );
 
 
-
 -- TABLA DE RANKINGS
 CREATE TABLE ranking (
     idRanking INT AUTO_INCREMENT PRIMARY KEY,
@@ -95,11 +100,11 @@ CREATE TABLE ranking (
 	FOREIGN KEY(idJugador) REFERENCES jugador(idJugador),
     FOREIGN KEY(idCategoria) REFERENCES categoria(idCategoria)
 );
-
 SELECT * FROM ranking;
 
--- INSERT INTO ranking (idJugador, idCategoria, posicion, puntosObtenidos) VALUES (1, 1, 1, 10);
-UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = 1;
+-- UPDATE ranking SET puntosObtenidos = puntosObtenidos + 10 WHERE idJugador = 2;
+-- INSERT INTO ranking (idJugador, puntosObtenidos) VALUES (2, 0);
+
 
 
 -- Insertar categorías
@@ -148,7 +153,9 @@ INSERT INTO opcionRespuesta (idPregunta, textoOpcion) VALUES
 SELECT * FROM pregunta;
 SELECT * FROM opcionRespuesta;
 
-UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 4;  
-UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 8;  
-UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 12; 
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 4;
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 8;
+UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 12;
 UPDATE opcionRespuesta SET esCorrecta = TRUE WHERE idOpcion = 16;
+
+-- SELECT r.*, j.nombreCompleto FROM ranking r JOIN jugador j ON r.idJugador = j.idJugador ORDER BY r.puntosObtenidos DESC;
